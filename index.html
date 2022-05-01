@@ -1,88 +1,55 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>loadmapsyncHTML</title>
-        <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
-        <meta content="width=device-width, height=device-height, minimum-scale=1.0, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-        <style type='text/css'>body{margin:0;padding:0;overflow:hidden;font-family:'Segoe UI',Helvetica,Arial,Sans-Serif}</style>
-    </head>
-    <body>
-        <div id='printoutPanel'></div>
-        <div id='myMap' style='width: 100%; height: 100%;'></div>
-        
-        <script type='text/javascript'>
-            function loadMapScenario() {
-                map = new Microsoft.Maps.Map(document.getElementById('myMap'), {center: new Microsoft.Maps.Location(25, -100)});
-                collection = new Microsoft.Maps.Layer();
-                itinerary = new Microsoft.Maps.Layer();
-                favorites = new Microsoft.Maps.Layer();
-                var count = 1;
+<head>
+    <title></title>
+    <meta charset="utf-8" />
 
-                var currentLayer = itinerary;
-
-                Microsoft.Maps.Events.addHandler(map, 'rightclick', (args) => {
-                    var point = args.location;
-                    var addPin = new Microsoft.Maps.Pushpin(point, {text: `${count}`});
-                    var info = new Microsoft.Maps.Infobox(point, {
-                        title: `Pushpin number ${count}`,
-                        description: `Lat: ${point.latitude}, Long: ${point.longitude}`, 
-                        visible: false,
-                        actions: [{
-                            label: 'Delete', 
-                            eventHandler: () => {
-                                currentLayer.remove(addPin);
-                                count--;
-                                info.setMap(null);
-                                directionsManager.clearAll()
-                            }
-                        }]
-                    });
-                    info.setMap(map);
-                    
-                    Microsoft.Maps.Events.addHandler(addPin, 'click', () => {
-                        info.setOptions({visible: true});
-                    });
-                    Microsoft.Maps.Events.addHandler(info, 'mouseleave', () => {
-                        Microsoft.Maps.Events.addHandler(map, 'click', () => {
-                            info.setOptions({visible: false});
-                        })
-                    });
-                    
-                    count++;
-                    currentLayer.add(addPin);
-
-                    var prims = currentLayer.getPrimitives();
-                    if(prims.length > 0) {
-                        Microsoft.Maps.loadModule('Microsoft.Maps.Directions', () => {
-                            directionsManager = new Microsoft.Maps.Directions.DirectionsManager(map);
-                            directionsManager.setRequestOptions({
-                                routeMode: Microsoft.Maps.Directions.RouteMode.driving
-                            });
-                            
-                            var locations = [];
-                            
-                            for(i = 0; i < prims.length; i++) {
-                                locations.push(new Microsoft.Maps.Location(prims[i].geometry.y, prims[i].geometry.x))
-                            }
-
-                            for(i = 0; i < locations.length; i++) {
-                                directionsManager.addWaypoint(new Microsoft.Maps.Directions.Waypoint({location: locations[i]}));
-                            }
-
-                            directionsManager.setRenderOptions({
-                                firstWaypointPushpinOptions: {visible: false},
-                                lastWaypointPushpinOptions: {visible: false},
-                                waypointPushpinOptions: {visible: false}
-                            });
-                            
-                            directionsManager.calculateDirections();
-                        });
-                    }
-                });
-
-                map.layers.insert(currentLayer);
-            }
-        </script>
-        <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol?key=AmunbIHLrsAQR59VvtQzDwP2_msWwfpBfW2_Kpyjk_ve4X1zryrCqd22h-0vziiW&callback=loadMapScenario' async defer></script>
-    </body>
+    <!-- Reference to the Bing Maps SDK -->
+    <script type='text/javascript'
+            src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=ApUQTTD7OuoyaVORYS25t6IzE0p9Pw_IVzQr1rRDycxQRf7vRRTgsOKULj3nvAL3'
+            async defer></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="other">
+        <div id="menu-side">
+            <div class="head">
+                <span class="back">&#8592</span>
+                <span class="title">Chi tiết chỉ đường</span>
+            </div>
+            <div id="details"></div>
+            <div class="no-info">Không có thông tin</div>
+        </div> 
+        <div id="menu">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </div>
+        <select id="vehicle"></select>
+        <!-- <div class="input-side">
+            <div class="find-side">
+                <span>Từ:</span><input type="text" id="find-address-from" class="find">
+                <button class="visitMapFrom">xem</button>
+            </div> 
+            <ul class="suggest-side from"></ul>
+        </div> -->
+        <div class="input-side">
+            <div class="find-side">
+                <span>Đến:</span><input type="text" id="find-address-to" class="find">
+                <button class="visitMapTo">xem</button>
+            </div> 
+            <ul class="suggest-side to"></ul>
+        </div>
+        <!-- <button id="direction">Tìm Đường</button>  -->
+        <!-- <button id="a">a</button>  -->
+    </div>
+    <div id="map"></div>
+    <div id="test"></div>
+    <script src="./index.js"></script>
+    <script src="./model/place.js"></script>
+    <script src="./model/findPlace.js"></script>
+    <script src="./model/findPath.js"></script>
+    <script src="./controllView/map.js"></script>
+    <script src="./model/vehicle.js"></script>
+</body>
 </html>
